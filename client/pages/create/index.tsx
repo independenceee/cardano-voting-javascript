@@ -81,6 +81,7 @@
 // export default Create;
 
 import React, { ChangeEvent, useState } from "react";
+import { useRouter } from "next/router";
 import axios from "axios";
 import { Ballot } from "../../type";
 import { toast } from "react-toastify";
@@ -88,6 +89,7 @@ import { toast } from "react-toastify";
 type Props = {};
 
 const Create = function ({}: Props) {
+    const router = useRouter();
     const [imagePath, setImagePath] = useState<string | null>(null!);
     const [image, setImage] = useState<File>(null!);
     const [fileName, setFileName] = useState<string>("Choose the file");
@@ -130,11 +132,12 @@ const Create = function ({}: Props) {
             formBallot.append("description", description);
             formBallot.append("addressWallet", addressWallet);
             formBallot.append("image", image);
-            await axios.post(
+            const { data } = await axios.post(
                 `http://localhost:8000/api/v1/ballots`,
                 formBallot,
             );
             await toast.success("Upload Success !");
+            await router.push(`/create/${data?.id}`);
         } catch (error) {
             toast.error("Upload Error !");
             console.log(error);

@@ -1,8 +1,5 @@
-import path from "path";
 import dotenv from "dotenv";
-import multer from "multer";
 import prisma from "../models/index.model";
-import upload from "../../configs/upload.config";
 
 class BallotController {
     constructor() {
@@ -44,20 +41,16 @@ class BallotController {
     async createBallot(request, response) {
         try {
             const { name, description, addressWallet } = request.body;
-            console.log(request.file);
-            const { image } = request.file;
-
+            const { filename } = request.file;
 
             const ballot = await prisma.ballot.create({
                 data: {
                     name: name,
                     description: description,
                     addressWallet: addressWallet,
-                    image: `http://localhost:8000/${request.file.filename}`,
+                    image: `http://localhost:${process.env.PORT}/${request.file.filename}`,
                 },
             });
-
-            console.log(ballot);
         } catch (error) {
             response.status(200).json({
                 message: error,
@@ -69,7 +62,7 @@ class BallotController {
         try {
             const { id } = request.params;
             const { name, description, addressWallet } = request.body;
-            const path = uploadConfig.uploadSingleFile();
+            const { filename } = request.file;
 
             const ballot = await prisma.ballot.updateMany({
                 where: {
@@ -78,7 +71,8 @@ class BallotController {
                 data: {
                     name: name,
                     description: description,
-                    image: `http://localhost:${process.env.PORT}${path}`,
+                    addressWallet: addressWallet,
+                    image: `http://localhost:${process.env.PORT}${request.file.filename}`,
                 },
             });
         } catch (error) {
